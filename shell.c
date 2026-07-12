@@ -1,6 +1,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <sys/errno.h>
 #include <sys/wait.h>
 #include <unistd.h>
 
@@ -9,14 +10,14 @@ int main() {
   size_t buf_len = 128;
   char *buf = malloc(buf_len);
   if (buf == NULL) {
-    printf("[ERROR]: unable to allocate buffer\n");
+    printf("[ERROR] unable to allocate buffer\n");
     return 1;
   }
 
   size_t argvec_c = 32;
   char **args = malloc(argvec_c * sizeof(char*));
   if (args == NULL) {
-    printf("[ERROR]: unable to allocate args buffer\n");
+    printf("[ERROR] unable to allocate args buffer\n");
     return 1;
   }
 
@@ -29,7 +30,7 @@ int main() {
         return 0;
       }
 
-      printf("[ERROR]: getline stat -1\n");
+      printf("[ERROR] getline stat -1\n");
       return 1;
     }
 
@@ -52,7 +53,7 @@ int main() {
         argvec_c *= 2;
         args = realloc(args, argvec_c * sizeof(char*));
         if (args == NULL) {
-          printf("[ERROR]: unable to reallocate args buffer\n");
+          printf("[ERROR] unable to reallocate args buffer\n");
           return 1;
         }
       }
@@ -65,7 +66,7 @@ int main() {
       argvec_c *= 2;
       args = realloc(args, argvec_c * sizeof(char*));
       if (args == NULL) {
-        printf("[ERROR]: unable to reallocate args buffer\n");
+        printf("[ERROR] unable to reallocate args buffer\n");
         return 1;
       }
     }
@@ -78,13 +79,17 @@ int main() {
 
     int pid = fork();
     if (pid == -1) {
-      printf("[ERROR]: fork failed\n");
+      printf("[ERROR] fork failed\n");
       return 1;
     }
     else if (pid == 0) {
       // child proc
       if (execvp(args[0], args) == -1) {
-        printf("[ERROR]: trying to exec\n");
+        if (errno == ENOENT) {
+          printf("%s: command not found\n", args[0]);
+          return 2;
+        }
+        perror("[ERROR] exec");
         return 124;
       }
     }
