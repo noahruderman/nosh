@@ -24,6 +24,11 @@ int main() {
     printf("prompt> ");
     ssize_t cmd_len = getline(&buf, &buf_len, stdin);
     if (cmd_len == -1) {
+      printf("\n");
+      if (feof(stdin)) {
+        return 0;
+      }
+
       printf("[ERROR]: getline stat -1\n");
       return 1;
     }
