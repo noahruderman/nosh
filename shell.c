@@ -37,8 +37,8 @@ int main() {
 
     int wc = 0;
     while ((token = strsep(&strp, " ")) != NULL) {
-      if (strp == token + 1) {
-        // skip empty tokens
+      // skip empty tokens
+      if (*token == '\0') {
         continue;
       }
 
@@ -65,6 +65,11 @@ int main() {
       }
     }
     args[wc] = NULL;
+
+    // ignore empty lines
+    if (wc == 0) {
+      continue;
+    }
 
     int pid = fork();
     if (pid == -1) {
