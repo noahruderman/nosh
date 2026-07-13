@@ -77,6 +77,17 @@ int main() {
       continue;
     }
 
+    // built-in commands
+    if (strcmp(args[0], "cd") == 0) {
+      if (args[1] == NULL || strcmp(args[1], "~") == 0 || strcmp(args[1], "-") == 0) {
+        args[1] = getenv("HOME");
+      }
+      if (chdir(args[1]) == -1) {
+        perror(args[1]);
+      }
+      continue;
+    }
+
     int pid = fork();
     if (pid == -1) {
       printf("[ERROR] fork failed\n");
