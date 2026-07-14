@@ -1,3 +1,4 @@
+#include <fcntl.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -95,6 +96,13 @@ int main() {
     }
     else if (pid == 0) {
       // child proc
+      if (args[wc-1][0] == '>') {
+        args[wc-1] = NULL;
+        int fd = open("out.txt", O_WRONLY|O_CREAT|O_TRUNC);
+        int dup_fd = dup2(fd, STDOUT_FILENO);
+        close(fd);
+      }
+
       if (execvp(args[0], args) == -1) {
         if (errno == ENOENT) {
           printf("%s: command not found\n", args[0]);
